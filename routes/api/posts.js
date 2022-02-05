@@ -14,7 +14,6 @@ router.post(
   [auth, check("text", "Text is  required").not().isEmpty()],
   async (req, res) => {
     const errors = validationResult(req);
-    console.log(errors);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
