@@ -143,9 +143,12 @@ router.get("/", async (req, res) => {
 router.get("/user/:user_id", async (req, res) => {
   try {
     // user_id from url
-    const profile = await Profile.findOne({ user: req.params.user_id }).populate("user", ["name", "avatar"]);
+    const profile = await Profile.findOne({
+      user: req.params.user_id,
+    }).populate("user", ["name", "avatar"]);
 
-    if (!profile) return res.status(400).json({ msg: "There is no profile for this user" });
+    if (!profile)
+      return res.status(400).json({ msg: "There is no profile for this user" });
 
     res.json(profile);
   } catch (err) {
@@ -268,13 +271,19 @@ router.delete("/", auth, async (req, res) => {
  */
 router.put(
   "/experience",
-  [auth, check("title", "title is required").not().isEmpty(), check("company", "company is required").not().isEmpty(), check("from", "from date is required").not().isEmpty()],
+  [
+    auth,
+    check("title", "title is required").not().isEmpty(),
+    check("company", "company is required").not().isEmpty(),
+    check("from", "from date is required").not().isEmpty(),
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const { title, company, location, from, to, current, description } = req.body;
+    const { title, company, location, from, to, current, description } =
+      req.body;
 
     const newExp = {
       title,
@@ -307,7 +316,9 @@ router.delete("/experience/:exp_id", auth, async (req, res) => {
     const profile = await Profile.findOne({ user: req.user.id });
     //get remove index
     // ['_id1','_id2', ...].indexOf('_id1') => 0
-    const removeIndex = profile.experience.map((item) => item.id).indexOf(req.params.exp_id);
+    const removeIndex = profile.experience
+      .map((item) => item.id)
+      .indexOf(req.params.exp_id);
     profile.experience.splice(removeIndex, 1);
     profile.save();
     res.json(profile);
@@ -368,7 +379,9 @@ router.delete("/education/:edu_id", auth, async (req, res) => {
     const profile = await Profile.findOne({ user: req.user.id });
     //get remove index
     // ['_id1','_id2', ...].indexOf('_id1') => 0
-    const removeIndex = profile.education.map((item) => item.id).indexOf(req.params.edu_id);
+    const removeIndex = profile.education
+      .map((item) => item.id)
+      .indexOf(req.params.edu_id);
     profile.education.splice(removeIndex, 1);
     profile.save();
     res.json(profile);
@@ -385,7 +398,9 @@ router.delete("/education/:edu_id", auth, async (req, res) => {
  */
 router.get("/github/:username", async (req, res) => {
   try {
-    const uri = encodeURI(`https://api.github.com/users/${req.params.username}/repos?per_page=5&sort=created:asc`);
+    const uri = encodeURI(
+      `https://api.github.com/users/${req.params.username}/repos?per_page=5&sort=created:asc`
+    );
 
     const headers = {
       "user-agent": "node.js",
@@ -393,7 +408,7 @@ router.get("/github/:username", async (req, res) => {
     };
 
     const gitHubResponse = await axios.get(uri, { headers });
-    
+
     return res.json(gitHubResponse.data);
   } catch (err) {
     console.error(err.message);
